@@ -1,24 +1,52 @@
 <script lang="ts">
-  let cpuPercentage = $state<number>(35);
-  let memoryUsage = $state<number>(4.3);
-  const memoryMax = 16;
+	import type { HardwareInfo, CPUInfo, MemoryInfo } from '@/types/hardware-types';
+	import { source } from 'sveltekit-sse';
 
-  $effect(() => {
-    const interval = setInterval(() => {
-      cpuPercentage = (Math.floor(Math.random() * 100));
-      memoryUsage = parseFloat((Math.random() * memoryMax).toFixed(1));
-    }, 1000);
+	const hardwareInfoMessage = source('/sse/hardware-info').select('hardware-info');
+	let hardwareInfo: HardwareInfo | undefined = $state();
 
-    return () => clearInterval(interval);
-  });
+	$effect(() => {
+		// TODO: Handle this initial state and errors better
+		if ($hardwareInfoMessage.length > 0) {
+			hardwareInfo = JSON.parse($hardwareInfoMessage || '{}');
+		}
+	});
+
+	const memoryFromKBToGb = (kilobytes: number): number => {
+		return parseFloat((kilobytes / 1024 / 1024).toFixed(2));
+	};
 </script>
 
-<div>
-  <h2>Hardware Monitor</h2>
-  <div>
-    <strong>CPU Usage:</strong> {cpuPercentage}%
-  </div>
-  <div>
-    <strong>Memory Usage:</strong> {memoryUsage} GB / {memoryMax} GB
-  </div>
+<div class="widget">
+	<h2>Hardware Monitor</h2>
+	{#if hardwareInfo}
+		{@render cpuUsage(hardwareInfo.cpu)}
+		{@render memoryUsage(hardwareInfo.memory)}
+	{/if}
 </div>
+
+{#snippet cpuUsage(cpu: CPUInfo)}
+	<div class="cpu-usage">
+		<div>
+			<strong>CPU Usage:</strong>
+			{cpu.usage}%
+		</div>
+		<div>
+			<strong>CPU Temp:</strong>
+			{cpu.temperature}°C
+		</div>
+		{#each cpu.coresUsage as coresUsage, index}
+			<div>
+				<strong>Core {index} Usage:</strong>
+				{coresUsage}%
+			</div>
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet memoryUsage(memory: MemoryInfo)}
+	<div class="memory-usage">
+		<strong>Memory Usage:</strong>
+		{memoryFromKBToGb(memory.usage)} GB / {memoryFromKBToGb(memory.total)} GB
+	</div>
+{/snippet}

@@ -8,4 +8,9 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+<nav>
+	<a href="/"><strong>Dashboard</strong></a> |
+	<a href="/hardware-monitor-history"><strong>Hardware Monitor History</strong></a>
+</nav>
+
 {@render children()}
