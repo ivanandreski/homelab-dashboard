@@ -40,10 +40,10 @@
 				<ProgressBar value={coresUsage} />
 			</div>
 		{/each}
-		<div>
+		<!-- <div>
 			<strong>CPU Temp:</strong>
 			{cpu.temperature}°C
-		</div>
+		</div> -->
 	</div>
 {/snippet}
 

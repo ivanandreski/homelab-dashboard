@@ -1,4 +1,3 @@
-import { HARDWARE_INFO_HISTORY_ENTRIES } from '@/dummy-data/HardwareInfoData';
 import { getHardwareInfo } from '@/service/HardwareMonitorService';
 import { produce } from 'sveltekit-sse';
 
